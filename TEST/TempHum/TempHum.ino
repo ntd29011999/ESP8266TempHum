@@ -41,7 +41,10 @@ IRDaikinESP ac(kIrLed);  // Set the GPIO to be used to sending the message
 // value_off is value on or off on remote AC. 0 - 2 (send ON 3 times)  --- 3 - 5 (send OFF 3 times)
 int value_off = 0;
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> b453662948ee7a5cae831221acfaee15dc1dfec4
 String nhietdo, doam, mota, postData; // value for POSTDATA 
 
 // SENSOR nhiet do
@@ -95,14 +98,18 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
+<<<<<<< HEAD
     // String for config mode off device
       String battat="";
       String chedo="";
       String led="";
+=======
+>>>>>>> b453662948ee7a5cae831221acfaee15dc1dfec4
    // Wait a few seconds between measurements.
       
       
       HTTPClient http; 
+<<<<<<< HEAD
 
             // get data
       http.begin("http://ntd29011999.000webhostapp.com/getdataDevice.php");              // Connect to host where MySQL databse is hosted
@@ -149,6 +156,8 @@ void loop() {
         }
       http.end();
       
+=======
+>>>>>>> b453662948ee7a5cae831221acfaee15dc1dfec4
 // Reading temperature or humidity takes about 250 milliseconds!
  // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
       float h = dht.readHumidity();
@@ -164,6 +173,7 @@ void loop() {
       Serial.print(" degrees Celcius, Humidity: ");
       Serial.print(h);
       digitalWrite(LED_BUILTIN, LOW);   // Turn the LED on (Note that LOW is the voltage level
+<<<<<<< HEAD
       if (chedo == "AUTO"){
          // DIEU KHIEN AUTO
          if (t >= 23 && t <= 32){
@@ -276,6 +286,105 @@ void loop() {
   
   
   
+=======
+
+       // DIEU KHIEN
+       if (t >= 23 && t <= 32){
+        mota = "binh thuong";
+       
+        if(t <=27){
+          if (value_off < 3) value_off = 3;
+          if (value_off<7 && value_off >= 3){
+//          ac.off();
+//          #if SEND_DAIKIN
+//          ac.send();
+//          value_off++;
+//          if (value_off == 6)
+//            value_off = 0;
+//          #endif  // SEND_DAIKIN
+            digitalWrite(RELAY1PIN, HIGH);
+            digitalWrite(LEDPIN, LOW);
+          
+          }
+        }
+      }
+      else if (t > 32){
+        
+        mota = "nong";
+        if (t > 35){
+          if(value_off >= 3) value_off = 0;
+          if(value_off < 3){
+          
+          Serial.println("Sending...");
+          digitalWrite(RELAY1PIN, LOW);
+          digitalWrite(LEDPIN, HIGH);
+//          // Set up what we want to send. See ir_Daikin.cpp for all the options.
+//          ac.on();
+//          ac.setFan(5);
+//          ac.setMode(kDaikinCool);
+//          ac.setTemp(22);
+//          ac.setSwingVertical(false);
+//          ac.setSwingHorizontal(false);
+//        
+//          // Set the current time to 1:33PM (13:33)
+//          // Time works in minutes past midnight
+//
+//          // Display what we are going to send.
+//          Serial.println(ac.toString());
+//        
+//          // Now send the IR signal.
+//        #if SEND_DAIKIN
+//          ac.send();
+//        #endif  // SEND_DAIKIN
+        value_off++;
+        }
+        }
+        else{
+        if(value_off >= 3) value_off = 0;
+        if(value_off < 3){
+          
+          Serial.println("Sending...");
+          digitalWrite(RELAY1PIN, LOW);
+          digitalWrite(LEDPIN, HIGH);
+//          // Set up what we want to send. See ir_Daikin.cpp for all the options.
+//          ac.on();
+//          ac.setFan(5);
+//          ac.setMode(kDaikinCool);
+//          ac.setTemp(25);
+//          ac.setSwingVertical(false);
+//          ac.setSwingHorizontal(false);
+//        
+//          // Set the current time to 1:33PM (13:33)
+//          // Time works in minutes past midnight
+//
+//          // Display what we are going to send.
+//          Serial.println(ac.toString());
+//        
+//          // Now send the IR signal.
+//        #if SEND_DAIKIN
+//          ac.send();
+//        #endif  // SEND_DAIKIN
+        value_off++;
+        }
+        }
+      }
+      else {
+        mota = "lanh";
+        digitalWrite(RELAY1PIN, HIGH);
+          digitalWrite(LEDPIN, LOW);
+//        ac.off();
+//          #if SEND_DAIKIN
+//          ac.send();
+//          value_off++;
+//          if (value_off == 6)
+//            value_off = 0;
+//          #endif  // SEND_DAIKIN
+          
+      }
+
+
+
+>>>>>>> b453662948ee7a5cae831221acfaee15dc1dfec4
 
 
 
@@ -309,7 +418,51 @@ void loop() {
         return; 
         }
       http.end();
+<<<<<<< HEAD
  
+=======
+      // get data
+      http.begin("http://ntd29011999.000webhostapp.com/getdata.php");              // Connect to host where MySQL databse is hosted
+      http.addHeader("Content-Type", "application/x-www-form-urlencoded");            //Specify content-type header
+ 
+      httpCode = http.GET();   // Send POST request to php file and store server response code in variable named httpCode
+      // if connection eatablished then do this
+      if (httpCode > 0) { 
+        Serial.println("Values get successfully."); 
+        Serial.println(httpCode); 
+        String webpage = http.getString();    // Get html webpage output and store it in a string
+        Serial.println(webpage + "\n");
+        DeserializationError error = deserializeJson(doc, webpage);
+
+  // Test if parsing succeeds.
+        if (error) {
+          Serial.print(F("deserializeJson() failed: "));
+          Serial.println(error.f_str());
+          return;
+        }
+      
+        // Fetch values.
+        float nd;
+        JsonArray array = doc.as<JsonArray>();
+        for(JsonVariant v : array) {
+          JsonObject obj = v.as<JsonObject>();
+          String sensor = obj["nhietdo"];
+          Serial.println(sensor);
+        }
+        doc.clear();
+      }
+
+// if failed to connect then return and restart
+
+      else { 
+        Serial.println(httpCode); 
+        Serial.println("Failed to upload values. \n"); 
+        http.end(); 
+        return; 
+        }
+      http.end();
+       
+>>>>>>> b453662948ee7a5cae831221acfaee15dc1dfec4
        
        
        
