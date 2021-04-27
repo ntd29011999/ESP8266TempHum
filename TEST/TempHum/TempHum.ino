@@ -25,7 +25,9 @@
 // DHT11 Nhiet do
 #define DHTPIN 5 // what digital pin we're connected to
 #define DHTTYPE DHT11 // DHT 11
-
+// LED VA RELAY QUAT
+#define RELAY1PIN 0
+#define LEDPIN 2
 // Hong ngoai may lanh
 const uint16_t kIrLed = 4;  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
 IRDaikinESP ac(kIrLed);  // Set the GPIO to be used to sending the message
@@ -53,40 +55,35 @@ void setup() {
     Serial.begin(115200);
     // LED
     pinMode(LED_BUILTIN, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
-
+    pinMode(RELAY1PIN, OUTPUT);     // Initialize the RELAY for fan pin as an output
+    pinMode(LEDPIN, OUTPUT);        // Initialize the LED pin as an output
   
     dht.begin(); // Start dht
-    WiFi.mode(WIFI_STA); // explicitly set mode, esp defaults to STA+AP
+  //WiFiManager
+  //Local intialization. Once its business is done, there is no need to keep it around
+  WiFiManager wifiManager;
+  //reset settings - for testing
+  //wifiManager.resetSettings();
 
+  //sets timeout until configuration portal gets turned off
+  //useful to make it all retry or go to sleep
+  //in seconds
+  wifiManager.setConfigPortalTimeout(180);
+  
+  //fetches ssid and pass and tries to connect
+  //if it does not connect it starts an access point with the specified name
+  //here  "AutoConnectAP"
+  //and goes into a blocking loop awaiting configuration
+  if(!wifiManager.autoConnect("AutoConnectAP")) {
+    Serial.println("failed to connect and hit timeout");
+    delay(3000);
+    //reset and try again, or maybe put it to deep sleep
+    ESP.restart();
+    delay(5000);
+  } 
 
-
-    
-    // WiFi.mode(WiFi_STA); // it is a good practice to make sure your code sets wifi mode how you want it.
-
-    //WiFiManager, Local intialization. Once its business is done, there is no need to keep it around
-    WiFiManager wm;
-
-    //reset settings - wipe credentials for testing
-    //wm.resetSettings();
-
-    // Automatically connect using saved credentials,
-    // if connection fails, it starts an access point with the specified name ( "AutoConnectAP"),
-    // if empty will auto generate SSID, if password is blank it will be anonymous AP (wm.autoConnect())
-    // then goes into a blocking loop awaiting configuration and will return success result
-
-    bool res;
-    // res = wm.autoConnect(); // auto generated AP name from chipid
-    // res = wm.autoConnect("AutoConnectAP"); // anonymous ap
-    res = wm.autoConnect("AutoConnectAP","123456"); // password protected ap
-
-    if(!res) {
-        Serial.println("Failed to connect");
-        // ESP.restart();
-    } 
-    else {
-        //if you get here you have connected to the WiFi    
-        Serial.println("connected...yeey :)");
-    }
+  //if you get here you have connected to the WiFi
+  Serial.println("connected...yeey :)");
 
     Serial.println("\n");
     Serial.println("Connection established!");  
@@ -116,6 +113,107 @@ void loop() {
       Serial.print(" degrees Celcius, Humidity: ");
       Serial.print(h);
       digitalWrite(LED_BUILTIN, LOW);   // Turn the LED on (Note that LOW is the voltage level
+
+       // DIEU KHIEN
+       if (t >= 23 && t <= 32){
+        mota = "binh thuong";
+       
+        if(t <=27){
+          if (value_off < 3) value_off = 3;
+          if (value_off<7 && value_off >= 3){
+//          ac.off();
+//          #if SEND_DAIKIN
+//          ac.send();
+//          value_off++;
+//          if (value_off == 6)
+//            value_off = 0;
+//          #endif  // SEND_DAIKIN
+            digitalWrite(RELAY1PIN, HIGH);
+            digitalWrite(LEDPIN, LOW);
+          
+          }
+        }
+      }
+      else if (t > 32){
+        
+        mota = "nong";
+        if (t > 35){
+          if(value_off >= 3) value_off = 0;
+          if(value_off < 3){
+          
+          Serial.println("Sending...");
+          digitalWrite(RELAY1PIN, LOW);
+          digitalWrite(LEDPIN, HIGH);
+//          // Set up what we want to send. See ir_Daikin.cpp for all the options.
+//          ac.on();
+//          ac.setFan(5);
+//          ac.setMode(kDaikinCool);
+//          ac.setTemp(22);
+//          ac.setSwingVertical(false);
+//          ac.setSwingHorizontal(false);
+//        
+//          // Set the current time to 1:33PM (13:33)
+//          // Time works in minutes past midnight
+//
+//          // Display what we are going to send.
+//          Serial.println(ac.toString());
+//        
+//          // Now send the IR signal.
+//        #if SEND_DAIKIN
+//          ac.send();
+//        #endif  // SEND_DAIKIN
+        value_off++;
+        }
+        }
+        else{
+        if(value_off >= 3) value_off = 0;
+        if(value_off < 3){
+          
+          Serial.println("Sending...");
+          digitalWrite(RELAY1PIN, LOW);
+          digitalWrite(LEDPIN, HIGH);
+//          // Set up what we want to send. See ir_Daikin.cpp for all the options.
+//          ac.on();
+//          ac.setFan(5);
+//          ac.setMode(kDaikinCool);
+//          ac.setTemp(25);
+//          ac.setSwingVertical(false);
+//          ac.setSwingHorizontal(false);
+//        
+//          // Set the current time to 1:33PM (13:33)
+//          // Time works in minutes past midnight
+//
+//          // Display what we are going to send.
+//          Serial.println(ac.toString());
+//        
+//          // Now send the IR signal.
+//        #if SEND_DAIKIN
+//          ac.send();
+//        #endif  // SEND_DAIKIN
+        value_off++;
+        }
+        }
+      }
+      else {
+        mota = "lanh";
+        digitalWrite(RELAY1PIN, HIGH);
+          digitalWrite(LEDPIN, LOW);
+//        ac.off();
+//          #if SEND_DAIKIN
+//          ac.send();
+//          value_off++;
+//          if (value_off == 6)
+//            value_off = 0;
+//          #endif  // SEND_DAIKIN
+          
+      }
+
+
+
+
+
+
+
       
 //convert value to String
       nhietdo = String(t);
@@ -185,92 +283,11 @@ void loop() {
         return; 
         }
       http.end();
-       if (t >= 23 && t <= 32){
-        mota = "binh thuong";
        
-        if(t <=27){
-          if (value_off < 3) value_off = 3;
-          if (value_off<7 && value_off >= 3){
-          ac.off();
-          #if SEND_DAIKIN
-          ac.send();
-          value_off++;
-          if (value_off == 6)
-            value_off = 0;
-          #endif  // SEND_DAIKIN
-          
-          }
-        }
-      }
-      else if (t > 32){
-        
-        mota = "nong";
-        if (t > 35){
-          if(value_off >= 3) value_off = 0;
-          if(value_off < 3){
-          
-          Serial.println("Sending...");
+       
+       
+       
 
-          // Set up what we want to send. See ir_Daikin.cpp for all the options.
-          ac.on();
-          ac.setFan(5);
-          ac.setMode(kDaikinCool);
-          ac.setTemp(22);
-          ac.setSwingVertical(false);
-          ac.setSwingHorizontal(false);
-        
-          // Set the current time to 1:33PM (13:33)
-          // Time works in minutes past midnight
-
-          // Display what we are going to send.
-          Serial.println(ac.toString());
-        
-          // Now send the IR signal.
-        #if SEND_DAIKIN
-          ac.send();
-        #endif  // SEND_DAIKIN
-        value_off++;
-        }
-        }
-        else{
-        if(value_off >= 3) value_off = 0;
-        if(value_off < 3){
-          
-          Serial.println("Sending...");
-
-          // Set up what we want to send. See ir_Daikin.cpp for all the options.
-          ac.on();
-          ac.setFan(5);
-          ac.setMode(kDaikinCool);
-          ac.setTemp(25);
-          ac.setSwingVertical(false);
-          ac.setSwingHorizontal(false);
-        
-          // Set the current time to 1:33PM (13:33)
-          // Time works in minutes past midnight
-
-          // Display what we are going to send.
-          Serial.println(ac.toString());
-        
-          // Now send the IR signal.
-        #if SEND_DAIKIN
-          ac.send();
-        #endif  // SEND_DAIKIN
-        value_off++;
-        }
-        }
-      }
-      else {
-        mota = "lanh";
-        ac.off();
-          #if SEND_DAIKIN
-          ac.send();
-          value_off++;
-          if (value_off == 6)
-            value_off = 0;
-          #endif  // SEND_DAIKIN
-          
-      }
     
 
    
