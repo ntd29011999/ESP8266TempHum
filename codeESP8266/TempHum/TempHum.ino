@@ -115,8 +115,8 @@ decode_results results;  // Somewhere to store the results
 
 
 // WIFI
-const char* ssid = "THANH TRUNG";         // Tên của mạng WiFi mà bạn muốn kết nối đến
-const char* password = "lalala12";// Mật khẩu của mạng WiFi
+const char* ssid = "Thanh Trung";         // Tên của mạng WiFi mà bạn muốn kết nối đến
+const char* password = "duong123";// Mật khẩu của mạng WiFi
 
 
 String nhietdo, doam, mota, postData; // value for POSTDATA 
@@ -173,7 +173,7 @@ void setup() {
 // the loop function runs over and over again forever
 void loop() {
    // Wait a few seconds between measurements.
-      delay(5000);
+      delay(3000);
       
       HTTPClient http; 
 // Reading temperature or humidity takes about 250 milliseconds!
@@ -202,7 +202,7 @@ void loop() {
       else mota = "lanh";
       postData = "nhietdo=" + nhietdo + "&doam=" + doam + "&mota=" + mota;
 
-      http.begin("http://192.168.1.3/androidwebservice/insertdata.php");              // Connect to host where MySQL databse is hosted
+      http.begin("http://172.20.10.2/androidwebserviceNew/insertdata.php");              // Connect to host where MySQL databse is hosted
       http.addHeader("Content-Type", "application/x-www-form-urlencoded");            //Specify content-type header
  
       int httpCode = http.POST(postData);   // Send POST request to php file and store server response code in variable named httpCode

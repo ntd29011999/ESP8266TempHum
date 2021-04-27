@@ -1,0 +1,7 @@
+4G@u?-1jdZuxe^4N
+http://ntd29011999.000webhostapp.com/getdata.php
+https://databases-auth.000webhost.com/sql.php?server=1&db=id16619845_duongdb&table=environmental&pos=0
+<?php
+    $connect = mysqli_connect("localhost","id16619845_duonguser","4G@u?-1jdZuxe^4N","id16619845_duongdb");
+    mysqli_query($connect,"SET NAMES 'utf8'");
+?>
