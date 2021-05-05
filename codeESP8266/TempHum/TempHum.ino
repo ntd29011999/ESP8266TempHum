@@ -33,13 +33,9 @@ IRDaikinESP ac(kIrLed);  // Set the GPIO to be used to sending the message
 
 
 // WIFI
-<<<<<<< HEAD
-const char* ssid = "Thanh Trung";         // Tên của mạng WiFi mà bạn muốn kết nối đến
-const char* password = "duong123";// Mật khẩu của mạng WiFi
-=======
+
 //const char* ssid = "THANH TRUNG";         // Tên của mạng WiFi mà bạn muốn kết nối đến
 //const char* password = "lalala12";// Mật khẩu của mạng WiFi
->>>>>>> b453662948ee7a5cae831221acfaee15dc1dfec4
 
 // value_off is value on or off on remote AC. 0 - 2 (send ON 3 times)  --- 3 - 5 (send OFF 3 times)
 int value_off = 0;
@@ -103,11 +99,8 @@ void setup() {
 // the loop function runs over and over again forever
 void loop() {
    // Wait a few seconds between measurements.
-<<<<<<< HEAD
       delay(3000);
-=======
-      
->>>>>>> b453662948ee7a5cae831221acfaee15dc1dfec4
+
       
       HTTPClient http; 
 // Reading temperature or humidity takes about 250 milliseconds!
@@ -131,13 +124,9 @@ void loop() {
       doam = String(h);
      
       postData = "nhietdo=" + nhietdo + "&doam=" + doam + "&mota=" + mota;
-<<<<<<< HEAD
 
-      http.begin("http://172.20.10.2/androidwebserviceNew/insertdata.php");              // Connect to host where MySQL databse is hosted
-=======
       // insert data
       http.begin("http://ntd29011999.000webhostapp.com/insertdata.php");              // Connect to host where MySQL databse is hosted
->>>>>>> b453662948ee7a5cae831221acfaee15dc1dfec4
       http.addHeader("Content-Type", "application/x-www-form-urlencoded");            //Specify content-type header
  
       int httpCode = http.POST(postData);   // Send POST request to php file and store server response code in variable named httpCode
